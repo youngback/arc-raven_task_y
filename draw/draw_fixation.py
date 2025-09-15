@@ -6,7 +6,7 @@ import math
 from psychopy import visual, core
 from config import FRAME_DT  # 1/60초
 
-def draw_fixation(visual_opt, color=None, duration=0.5):
+def draw_fixation(visual_opt, color=None, duration=0.5, global_clock=None, global_frame_log=None):
     """
     화면 중앙에 fixation cross를 약 duration초 동안 프레임 루프로 표시.
     기본 0.5초(≈30프레임). core.wait 사용 X.
@@ -33,6 +33,13 @@ def draw_fixation(visual_opt, color=None, duration=0.5):
         ver_line.draw()
         win.flip()
 
+        if global_clock is not None and global_frame_log is not None:
+            frame_abs = len(global_frame_log) + 1
+            global_frame_log.append({
+                "frame_abs": frame_abs,
+                "time_abs": global_clock.getTime()
+            })
+
         # 프레임 잔여시간(1/60초까지) 채우기
         i = 0
         while (clock.getTime() - t0) < FRAME_DT:
@@ -41,7 +48,7 @@ def draw_fixation(visual_opt, color=None, duration=0.5):
         frame_count += 1
 
 
-def wait_for_fixation_hover(visual_opt, dwell=1.0, feedback=True, max_duration=None):
+def wait_for_fixation_hover(visual_opt, dwell=1.0, feedback=True, max_duration=None, global_clock=None, global_frame_log=None):
     """
     fixation cross 주변(hover_radius)에서 마우스를 dwell초 동안 유지하면 통과.
     - feedback=True면 hover 중 색을 바꿈.
@@ -123,6 +130,13 @@ def wait_for_fixation_hover(visual_opt, dwell=1.0, feedback=True, max_duration=N
                 break
         else:
             hover_start = None
+
+        if global_clock is not None and global_frame_log is not None:
+            frame_abs = len(global_frame_log) + 1
+            global_frame_log.append({
+                "frame_abs": frame_abs,
+                "time_abs": global_clock.getTime()
+            })
 
         # 종료 키
         if event.getKeys(["escape", "q"]):
